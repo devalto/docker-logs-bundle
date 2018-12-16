@@ -1,0 +1,30 @@
+{
+  "name": "chrif/ChrifDockerLogsBundle",
+  "type": "symfony-bundle",
+  "description": "Chrif DockerLogsBundle",
+  "keywords": ["log", "logging", "docker"],
+  "homepage": "https://github.com/chrif",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Christian Fecteau"
+    }
+  ],
+  "require": {
+    "php": ">=7.0",
+    "symfony/monolog-bundle": "~3.3",
+    "symfony/dependency-injection": "~4.0",
+    "symfony/config": "~4.0"
+  },
+  "require-dev": {
+    "symfony/yaml": "~4.0",
+    "symfony/console": "~4.0",
+    "symfony/phpunit-bridge": "^4.0"
+  },
+  "autoload": {
+    "psr-4": { "Chrif\\Bundle\\DockerLogsBundle\\": "" },
+    "exclude-from-classmap": [
+      "/Tests/"
+    ]
+  }
+}
