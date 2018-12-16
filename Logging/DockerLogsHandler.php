@@ -7,7 +7,7 @@ use Symfony\Bridge\Monolog\Handler\ConsoleHandler;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class NonCliProcessConsoleHandler extends ConsoleHandler {
+final class DockerLogsHandler extends ConsoleHandler {
 
 	private $levelToVerbosityMap = [
 		Logger::ERROR => OutputInterface::VERBOSITY_QUIET,

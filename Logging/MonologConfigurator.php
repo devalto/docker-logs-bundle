@@ -7,9 +7,13 @@ use Symfony\Component\DependencyInjection\Definition;
 
 /**
  *
- * Sample config created with:
- * new LoggingConfiguration(['app', 'request']):
+ * Example config:
  *
+ * chrif_docker_logs:
+ *   channels: ["app","request"]
+ *
+ *
+ * Result after container build:
  *
  * parameters:
  *   env(LOGGING_APP): "debug"
@@ -18,29 +22,29 @@ use Symfony\Component\DependencyInjection\Definition;
  *
  * monolog:
  *   handlers:
- *     app:
+ *     chrif_docker_logs.logging.handler.app:
  *       type: service
- *         id: app.logging.handler.app
+ *         id: chrif_docker_logs.logging.handler.app
  *         channels: ["app"]
- *     request:
+ *     chrif_docker_logs.logging.handler.request:
  *       type: service
- *         id: app.logging.handler.request
+ *         id: chrif_docker_logs.logging.handler.request
  *         channels: ["request"]
- *     other:
+ *     chrif_docker_logs.logging.handler.other:
  *       type: service
- *         id: app.logging.handler.other
+ *         id: chrif_docker_logs.logging.handler.other
  *         channels: ["!app","!request"]
  *
  * services:
- *   app.logging.handler.app:
- *     class: App\Logging\NonCliProcessConsoleHandler
- *     arguments: [ '%env(string:LOGGING_APP)%' ]
- *   app.logging.handler.request:
- *     class: App\Logging\NonCliProcessConsoleHandler
- *     arguments: [ '%env(string:LOGGING_REQUEST)%' ]
- *   app.logging.handler.other:
- *     class: App\Logging\NonCliProcessConsoleHandler
- *     arguments: [ '%env(string:LOGGING_OTHER)%' ]
+ *   chrif_docker_logs.logging.handler.app:
+ *     class: Chrif\Bundle\DockerLogsBundle\Logging\DockerLogsHandler
+ *     arguments: [ '%env(string:LOGGING_APP)%', true ]
+ *   chrif_docker_logs.logging.handler.request:
+ *     class: Chrif\Bundle\DockerLogsBundle\Logging\DockerLogsHandler
+ *     arguments: [ '%env(string:LOGGING_REQUEST)%', true ]
+ *   chrif_docker_logs.logging.handler.other:
+ *     class: Chrif\Bundle\DockerLogsBundle\Logging\DockerLogsHandler
+ *     arguments: [ '%env(string:LOGGING_OTHER)%', true ]
  *
  */
 final class MonologConfigurator {
@@ -127,7 +131,7 @@ final class MonologConfigurator {
 		$container->setDefinition(
 			$serviceId,
 			new Definition(
-				NonCliProcessConsoleHandler::class,
+				DockerLogsHandler::class,
 				['%env(string:' . $levelEnvName . ')%', $this->colors ]
 			)
 		);
