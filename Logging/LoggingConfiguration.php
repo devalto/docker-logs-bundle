@@ -60,7 +60,7 @@ final class LoggingConfiguration {
 	/**
 	 * @var string
 	 */
-	private $appChannel;
+	private $debugChannel;
 
 	/**
 	 * @var bool
@@ -68,16 +68,16 @@ final class LoggingConfiguration {
 	private $createOtherHandler;
 
 	public function __construct(
-		array $channels = ["app", "event", "security", "request", "console", "php"],
-		string $servicePrefix = 'app.logging.handler.',
-		string $envPrefix = 'LOGGING_',
-		string $appChannel = 'app',
-		bool $createOtherHandler = true
+		array $channels,
+		string $servicePrefix,
+		string $envPrefix,
+		string $debugChannel,
+		bool $createOtherHandler
 	) {
 		$this->channels = $channels;
 		$this->servicePrefix = $servicePrefix;
 		$this->envPrefix = $envPrefix;
-		$this->appChannel = $appChannel;
+		$this->debugChannel = $debugChannel;
 		$this->createOtherHandler = $createOtherHandler;
 	}
 
@@ -88,7 +88,7 @@ final class LoggingConfiguration {
 				$channel,
 				$this->servicePrefix . $channel,
 				$this->envPrefix . strtoupper($channel),
-				$channel == $this->appChannel ? 'debug' : 'notice',
+				$channel == $this->debugChannel ? 'debug' : 'notice',
 				[$channel],
 				false
 			);
@@ -124,7 +124,7 @@ final class LoggingConfiguration {
 			)
 		);
 		$handler->setAutowired(true);
-		$container->loadFromExtension(
+		$container->prependExtensionConfig(
 			'monolog',
 			[
 				'handlers' => [

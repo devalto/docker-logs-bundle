@@ -1,0 +1,5 @@
+chrif_docker_logs:
+    channels: [ "app", "php" ]
+    env_prefix: 'LOGGING_'
+    debug_channel: "app"
+    create_other_handler: true
