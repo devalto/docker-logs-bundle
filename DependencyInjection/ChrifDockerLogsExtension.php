@@ -2,7 +2,7 @@
 
 namespace Chrif\Bundle\DockerLogsBundle\DependencyInjection;
 
-use Chrif\Bundle\DockerLogsBundle\Logging\LoggingConfiguration;
+use Chrif\Bundle\DockerLogsBundle\Logging\MonologConfigurator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -18,20 +18,29 @@ final class ChrifDockerLogsExtension extends Extension {
 	 * @throws \Exception
 	 */
 	public function load(array $configs, ContainerBuilder $container) {
+		$configuration = $this->getConfiguration($configs, $container);
+		$config = $this->processConfiguration($configuration, $configs);
+
 		$loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
 		$loader->load('services.yml');
 
-		$configuration = $this->getConfiguration([], $container);
-		$config = $this->processConfiguration($configuration, []);
-
-		$loggingConfiguration = new LoggingConfiguration(
+		$monologConfigurator = new MonologConfigurator(
 			$config['channels'],
 			'chrif_docker_logs.handler.',
 			$config['env_prefix'],
 			$config['debug_channel'],
-			$config['create_other_handler']
+			$config['create_other_handler'],
+			$config['colors']
 		);
-		$loggingConfiguration->configureContainer($container);
+
+		$handlers = $monologConfigurator->handlersConfig($container);
+
+		$container->prependExtensionConfig(
+			'monolog',
+			[
+				'handlers' => $handlers,
+			]
+		);
 	}
 
 }

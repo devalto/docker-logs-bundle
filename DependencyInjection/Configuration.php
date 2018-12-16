@@ -44,6 +44,10 @@ final class Configuration implements ConfigurationInterface {
 					->info("If true, all channels not listed will have the LOGGING_OTHER level which defaults to 'debug'.")
 					->defaultValue(true)
 				->end()
+				->booleanNode('colors')
+					->info("If true, use a decorated (colored) console output if available.")
+					->defaultValue(true)
+				->end()
 			->end();
 		// @formatter:on
 

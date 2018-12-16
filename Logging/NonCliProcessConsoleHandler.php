@@ -17,7 +17,7 @@ final class NonCliProcessConsoleHandler extends ConsoleHandler {
 		Logger::DEBUG => OutputInterface::VERBOSITY_DEBUG,
 	];
 
-	public function __construct(string $level = Logger::DEBUG, bool $colors = true) {
+	public function __construct(string $level, bool $colors) {
 		$level = Logger::toMonologLevel($level);
 		$consoleOutput = new ConsoleOutput($this->levelToVerbosityMap[$level], $colors);
 

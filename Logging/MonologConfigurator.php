@@ -43,7 +43,7 @@ use Symfony\Component\DependencyInjection\Definition;
  *     arguments: [ '%env(string:LOGGING_OTHER)%' ]
  *
  */
-final class LoggingConfiguration {
+final class MonologConfigurator {
 
 	/**
 	 * @var string[]
@@ -66,27 +66,35 @@ final class LoggingConfiguration {
 	 * @var bool
 	 */
 	private $createOtherHandler;
+	/**
+	 * @var bool
+	 */
+	private $colors;
 
 	public function __construct(
 		array $channels,
 		string $servicePrefix,
 		string $envPrefix,
 		string $debugChannel,
-		bool $createOtherHandler
+		bool $createOtherHandler,
+		bool $colors
 	) {
 		$this->channels = $channels;
 		$this->servicePrefix = $servicePrefix;
 		$this->envPrefix = $envPrefix;
 		$this->debugChannel = $debugChannel;
 		$this->createOtherHandler = $createOtherHandler;
+		$this->colors = $colors;
 	}
 
-	public function configureContainer(ContainerBuilder $container) {
+	public function handlersConfig(ContainerBuilder $container) {
+		$handlers = [];
+
 		foreach ($this->channels as $channel) {
-			$this->addHandler(
+			$serviceId = $this->servicePrefix . $channel;
+			$handlers[$serviceId] = $this->addHandler(
 				$container,
-				$channel,
-				$this->servicePrefix . $channel,
+				$serviceId,
 				$this->envPrefix . strtoupper($channel),
 				$channel == $this->debugChannel ? 'debug' : 'notice',
 				[$channel],
@@ -94,53 +102,46 @@ final class LoggingConfiguration {
 			);
 		}
 		if ($this->createOtherHandler) {
-			$this->addHandler(
+			$serviceId = $this->servicePrefix . 'other';
+			$handlers[$serviceId] = $this->addHandler(
 				$container,
-				'other',
-				$this->servicePrefix . 'other',
+				$serviceId,
 				$this->envPrefix . 'OTHER',
 				'debug',
 				$this->channels,
 				true
 			);
 		}
+		return $handlers;
 	}
 
 	private function addHandler(
 		ContainerBuilder $container,
-		string $name,
 		string $serviceId,
 		string $levelEnvName,
 		string $defaultLevel,
 		array $channels,
 		bool $exclusive
-	) {
+	): array {
 		$container->setParameter("env($levelEnvName)", $defaultLevel);
-		$handler = $container->setDefinition(
+		$container->setDefinition(
 			$serviceId,
 			new Definition(
 				NonCliProcessConsoleHandler::class,
-				['%env(string:' . $levelEnvName . ')%']
+				['%env(string:' . $levelEnvName . ')%', $this->colors ]
 			)
 		);
-		$handler->setAutowired(true);
-		$container->prependExtensionConfig(
-			'monolog',
-			[
-				'handlers' => [
-					$name => [
-						'type' => 'service',
-						'id' => $serviceId,
-						'channels' => !$exclusive ? $channels : array_map(
-							function ($v) {
-								return "!$v";
-							},
-							$channels
-						),
-					],
-				],
-			]
-		);
+
+		return [
+			'type' => 'service',
+			'id' => $serviceId,
+			'channels' => !$exclusive ? $channels : array_map(
+				function ($v) {
+					return "!$v";
+				},
+				$channels
+			),
+		];
 	}
 
 }
