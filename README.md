@@ -1,8 +1,15 @@
-Installation
-============
+# DockerLogsBundle
 
-Applications that use Symfony Flex
-----------------------------------
+DockerLogsBundle is intended for containerized Symfony applications whose logs should all be redirected to `stderr` for use with either `docker logs` or `docker-compose logs`.
+
+## Features
+* Automatic redirect of non cli processes like web server or queue consumer to `stderr`,
+* Configurable level for each Monolog channel with an env var `LOGGIN_APP=debug`.
+* Decorated console formatter.
+
+## Installation
+
+### Applications that use Symfony Flex
 
 Open a command console, enter your project directory and execute:
 
@@ -10,10 +17,9 @@ Open a command console, enter your project directory and execute:
 $ composer require <package-name>
 ```
 
-Applications that don't use Symfony Flex
-----------------------------------------
+### Applications that don't use Symfony Flex
 
-### Step 1: Download the Bundle
+#### Step 1: Download the Bundle
 
 Open a command console, enter your project directory and execute the
 following command to download the latest stable version of this bundle:
@@ -26,10 +32,12 @@ This command requires you to have Composer installed globally, as explained
 in the [installation chapter](https://getcomposer.org/doc/00-intro.md)
 of the Composer documentation.
 
-### Step 2: Enable the Bundle
+#### Step 2: Enable the Bundle
 
 Then, enable the bundle by adding it to the list of registered bundles
 in the `app/AppKernel.php` file of your project:
+
+_Make sure to place it above Monolog._
 
 ```php
 <?php
@@ -42,7 +50,8 @@ class AppKernel extends Kernel
     {
         $bundles = array(
             // ...
-            new <vendor>\<bundle-name>\<bundle-long-name>(),
+            new \Chrif\Bundle\DockerLogsBundle\ChrifDockerLogsBundle(),
+            new \Symfony\Bundle\MonologBundle\MonologBundle(),
         );
 
         // ...
