@@ -1,7 +1,7 @@
 {
-  "name": "chrif/ChrifDockerLogsBundle",
+  "name": "chrif/docker-logs-bundle",
   "type": "symfony-bundle",
-  "description": "Chrif DockerLogsBundle",
+  "description": "DockerLogsBundle is intended for containerized Symfony applications.",
   "keywords": [
     "log",
     "logging",

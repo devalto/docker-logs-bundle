@@ -4,7 +4,7 @@ DockerLogsBundle is intended for containerized Symfony applications whose logs s
 
 ## Features
 * Automatic redirect of non cli processes like web server or queue consumer to `stderr`,
-* Configurable level for each Monolog channel with an env var `LOGGIN_APP=debug`.
+* Configurable level for each Monolog channel with an env var like `LOGGIN_APP=debug`.
 * Decorated console formatter.
 
 ## Installation
@@ -14,7 +14,7 @@ DockerLogsBundle is intended for containerized Symfony applications whose logs s
 Open a command console, enter your project directory and execute:
 
 ```console
-$ composer require <package-name>
+$ composer require chrif/docker-logs-bundle
 ```
 
 ### Applications that don't use Symfony Flex
@@ -25,7 +25,7 @@ Open a command console, enter your project directory and execute the
 following command to download the latest stable version of this bundle:
 
 ```console
-$ composer require <package-name>
+$ composer require chrif/docker-logs-bundle
 ```
 
 This command requires you to have Composer installed globally, as explained
