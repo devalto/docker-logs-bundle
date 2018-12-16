@@ -23,8 +23,4 @@ final class DockerLogsHandler extends ConsoleHandler {
 
 		parent::__construct($consoleOutput->getErrorOutput());
 	}
-
-	public static function getSubscribedEvents() {
-		return [];
-	}
 }

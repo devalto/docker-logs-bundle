@@ -128,13 +128,14 @@ final class MonologConfigurator {
 		bool $exclusive
 	): array {
 		$container->setParameter("env($levelEnvName)", $defaultLevel);
-		$container->setDefinition(
+		$definition = $container->setDefinition(
 			$serviceId,
 			new Definition(
 				DockerLogsHandler::class,
 				['%env(string:' . $levelEnvName . ')%', $this->colors ]
 			)
 		);
+		$definition->addTag('kernel.event_subscriber');
 
 		return [
 			'type' => 'service',
