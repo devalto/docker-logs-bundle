@@ -60,3 +60,38 @@ class AppKernel extends Kernel
     // ...
 }
 ```
+
+## Default configuration
+```
+chrif_docker_logs:
+
+    # Each channel will have a configurable logging level through an env var named 'env_prefix' + 'channel'. Example: LOGGING_APP
+    channels:
+
+        # Defaults:
+        - app
+        - event
+        - doctrine
+        - console
+        - php
+
+    # Default logging level for all channels in 'channels'.
+    default_logging_level: notice
+
+    # These channels will be muted in a Symfony command without the --'docker-logs' option.
+    channels_to_ignore_in_console:
+
+        # Defaults:
+        - event
+        - doctrine
+        - console
+
+    # This is the prefix for the env vars.
+    env_prefix:           LOGGING_
+
+    # If true, all channels not listed in 'channels' will have the LOGGING_OTHER level which defaults to 'debug'. Useful for finding new channels to add in the 'channels' config.
+    create_other_handler: true
+
+    # If true, use a decorated (colored) console output (when available).
+    colors:               true
+```
