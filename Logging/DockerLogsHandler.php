@@ -79,7 +79,6 @@ final class DockerLogsHandler extends AbstractProcessingHandler implements Event
 					$record = $formatter->replacePlaceHolder($record);
 				}
 
-				$record['extra'] = [];
 				$record['context'] = [];
 
 				return $record;
