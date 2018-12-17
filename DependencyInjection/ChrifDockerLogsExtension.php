@@ -26,12 +26,12 @@ final class ChrifDockerLogsExtension extends Extension {
 
 		$monologConfigurator = new MonologConfigurator(
 			$config['channels'],
-			'chrif_docker_logs.handler.',
 			$config['env_prefix'],
 			$config['default_logging_level'],
 			$config['create_other_handler'],
 			$config['colors'],
-			$config['channels_to_ignore_in_console']
+			$config['channels_to_ignore_in_console'],
+			$config['channels_with_muted_context']
 		);
 
 		$handlers = $monologConfigurator->handlersConfig($container);

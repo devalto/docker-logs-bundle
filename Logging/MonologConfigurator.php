@@ -56,7 +56,7 @@ final class MonologConfigurator {
 	/**
 	 * @var string
 	 */
-	private $servicePrefix;
+	private $servicePrefix = 'chrif_docker_logs.handler.';
 	/**
 	 * @var string
 	 */
@@ -78,23 +78,27 @@ final class MonologConfigurator {
 	 * @var array
 	 */
 	private $channelsToIgnoreInConsole;
+	/**
+	 * @var array
+	 */
+	private $channelsWithMutedContext;
 
 	public function __construct(
 		array $channels,
-		string $servicePrefix,
 		string $envPrefix,
 		string $defaultLoggingLevel,
 		bool $createOtherHandler,
 		bool $colors,
-		array $channelsToIgnoreInConsole
+		array $channelsToIgnoreInConsole,
+		array $channelsWithMutedContext
 	) {
 		$this->channels = $channels;
-		$this->servicePrefix = $servicePrefix;
 		$this->envPrefix = $envPrefix;
 		$this->defaultLoggingLevel = $defaultLoggingLevel;
 		$this->createOtherHandler = $createOtherHandler;
 		$this->colors = $colors;
 		$this->channelsToIgnoreInConsole = $channelsToIgnoreInConsole;
+		$this->channelsWithMutedContext = $channelsWithMutedContext;
 	}
 
 	public function handlersConfig(ContainerBuilder $container) {
@@ -109,7 +113,8 @@ final class MonologConfigurator {
 				$this->defaultLoggingLevel,
 				[$channel],
 				false,
-				in_array($channel, $this->channelsToIgnoreInConsole)
+				in_array($channel, $this->channelsToIgnoreInConsole),
+				$channel
 			);
 		}
 		if ($this->createOtherHandler) {
@@ -135,14 +140,20 @@ final class MonologConfigurator {
 		string $defaultLevel,
 		array $channels,
 		bool $exclusive,
-		bool $ignoredInConsole
+		bool $ignoredInConsole,
+		string $channel = null
 	): array {
 		$container->setParameter("env($levelEnvName)", $defaultLevel);
 		$definition = $container->setDefinition(
 			$serviceId,
 			new Definition(
 				DockerLogsHandler::class,
-				['%env(string:' . $levelEnvName . ')%', $this->colors, $ignoredInConsole]
+				[
+					'%env(string:' . $levelEnvName . ')%',
+					$this->colors,
+					$ignoredInConsole,
+					in_array($channel, $this->channelsWithMutedContext),
+				]
 			)
 		);
 		$definition->addTag('kernel.event_subscriber');

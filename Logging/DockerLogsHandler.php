@@ -14,15 +14,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class DockerLogsHandler extends ConsoleHandler {
 
 	/**
+	 * @var ConsoleFormatter
+	 */
+	protected $formatter;
+	/**
 	 * @var bool
 	 */
 	private $ignoredInConsole;
-
 	/**
 	 * @var
 	 */
 	private $isConsole = false;
-
 	private $levelToVerbosityMap = [
 		Logger::ERROR => OutputInterface::VERBOSITY_QUIET,
 		Logger::WARNING => OutputInterface::VERBOSITY_NORMAL,
@@ -30,12 +32,45 @@ final class DockerLogsHandler extends ConsoleHandler {
 		Logger::INFO => OutputInterface::VERBOSITY_VERY_VERBOSE,
 		Logger::DEBUG => OutputInterface::VERBOSITY_DEBUG,
 	];
+	/**
+	 * @var bool
+	 */
+	private $colors;
+	/**
+	 * @var int
+	 */
+	private $verbosity;
+	/**
+	 * @var bool
+	 */
+	private $noContext;
 
-	public function __construct(string $level, bool $colors, bool $ignoredInConsole) {
+	public function __construct(string $level, bool $colors, bool $ignoredInConsole, bool $noContext) {
+		$this->level = Logger::toMonologLevel($level);
+		$this->colors = $colors;
 		$this->ignoredInConsole = $ignoredInConsole;
-		$level = Logger::toMonologLevel($level);
-		$consoleOutput = new ConsoleOutput($this->levelToVerbosityMap[$level], $colors);
+		$this->noContext = $noContext;
+		$this->verbosity = $this->levelToVerbosityMap[$this->level];
+
+		$consoleOutput = new ConsoleOutput($this->verbosity, $this->colors);
 		parent::__construct($consoleOutput->getErrorOutput());
+
+		$this->setFormatter(
+			new ConsoleFormatter([
+				'colors' => $this->colors,
+				'multiline' => OutputInterface::VERBOSITY_DEBUG <= $this->verbosity,
+			])
+		);
+		if ($this->noContext) {
+			$this->pushProcessor(function ($record) {
+				$record = $this->formatter->replacePlaceHolder($record);
+
+				$record['extra'] = [];
+				$record['context'] = [];
+
+				return $record;
+			});
+		}
 	}
 
 	public function isHandling(array $record) {
