@@ -22,7 +22,7 @@ final class Configuration implements ConfigurationInterface {
 
 		// @formatter:off
 		$rootNode
-			->children()
+			->children() // todo array prototype instead?
 				->arrayNode('channels')
 					->info("Each channel will have a configurable logging level through an env var named 'env_prefix' + 'channel'. Example: LOGGING_APP")
 					->scalarPrototype()
@@ -67,6 +67,7 @@ final class Configuration implements ConfigurationInterface {
 					->defaultValue(true)
 				->end()
 				->booleanNode('colors')
+					// todo validate class_exists(VarCloner::class)
 					->info("If true, use a decorated (colored) console output (when available).")
 					->defaultValue(true)
 				->end()

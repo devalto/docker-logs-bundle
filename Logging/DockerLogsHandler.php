@@ -37,7 +37,7 @@ final class DockerLogsHandler extends AbstractProcessingHandler implements Event
 	/**
 	 * @var bool
 	 */
-	private $noContext;
+	private $removeContextAndExtra;
 	/**
 	 * @var ConsoleOutput
 	 */
@@ -63,27 +63,14 @@ final class DockerLogsHandler extends AbstractProcessingHandler implements Event
 		Logger::DEBUG => OutputInterface::VERBOSITY_DEBUG,
 	];
 
-	public function __construct(string $level, bool $colors, bool $ignoredInConsole, bool $noContext) {
+	public function __construct(string $level, bool $colors, bool $ignoredInConsole, bool $removeContextAndExtra) {
 		parent::__construct($level, true);
 
 		$this->colors = $colors;
 		$this->ignoredInConsole = $ignoredInConsole;
-		$this->noContext = $noContext;
+		$this->removeContextAndExtra = $removeContextAndExtra;
 		$this->verbosity = $this->levelToVerbosityMap[$this->level];
 		$this->output = new ConsoleOutput($this->verbosity, $this->colors);
-
-		if ($this->noContext) {
-			$this->pushProcessor(function ($record) {
-				$formatter = $this->getFormatter();
-				if ($formatter instanceof ConsoleFormatter) {
-					$record = $formatter->replacePlaceHolder($record);
-				}
-
-				$record['context'] = [];
-
-				return $record;
-			});
-		}
 	}
 
 	/**
@@ -179,6 +166,7 @@ final class DockerLogsHandler extends AbstractProcessingHandler implements Event
 		return new ConsoleFormatter([
 			'colors' => $this->output->isDecorated(),
 			'multiline' => OutputInterface::VERBOSITY_DEBUG <= $this->output->getVerbosity(),
+			'remove_context_and_extra' => $this->removeContextAndExtra,
 		]);
 	}
 

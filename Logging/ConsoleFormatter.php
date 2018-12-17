@@ -45,6 +45,7 @@ class ConsoleFormatter implements FormatterInterface {
 			'multiline' => false,
 			'level_name_format' => '%-9s',
 			'ignore_empty_context_and_extra' => true,
+			'remove_context_and_extra' => false,
 		],
 			$options);
 
@@ -84,13 +85,13 @@ class ConsoleFormatter implements FormatterInterface {
 
 		$levelColor = self::$levelColorMap[$record['level']];
 
-		if (!$this->options['ignore_empty_context_and_extra'] || !empty($record['context'])) {
+		if (!$this->options['remove_context_and_extra'] && !$this->options['ignore_empty_context_and_extra'] || !empty($record['context'])) {
 			$context = ($this->options['multiline'] ? "\n" : ' ') . $this->dumpData($record['context']);
 		} else {
 			$context = '';
 		}
 
-		if (!$this->options['ignore_empty_context_and_extra'] || !empty($record['extra'])) {
+		if (!$this->options['remove_context_and_extra'] && !$this->options['ignore_empty_context_and_extra'] || !empty($record['extra'])) {
 			$extra = ($this->options['multiline'] ? "\n" : ' ') . $this->dumpData($record['extra']);
 		} else {
 			$extra = '';
