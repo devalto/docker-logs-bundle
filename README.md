@@ -1,9 +1,9 @@
 # DockerLogsBundle
 
-DockerLogsBundle is intended for containerized Symfony applications whose logs should all be redirected to `stderr` for use with either `docker logs` or `docker-compose logs`.
+DockerLogsBundle is intended for containerized Symfony applications whose logs you would like to redirect `stderr` for use with either `docker logs` or `docker-compose logs`, but without tampering with the normal output to `stderr` of Symfony commands ran manually, not as a service.
 
 ## Features
-* Automatic redirect of non cli processes like web server or queue consumer to `stderr`,
+* Automatic redirect of non cli processes like web server or queue consumer to `stderr`.
 * Configurable level for each Monolog channel with an env var like `LOGGIN_APP=debug`.
 * Decorated console formatter.
 

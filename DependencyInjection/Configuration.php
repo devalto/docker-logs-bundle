@@ -2,6 +2,7 @@
 
 namespace Chrif\Bundle\DockerLogsBundle\DependencyInjection;
 
+use Chrif\Bundle\DockerLogsBundle\DependencyInjection\Compiler\DockerLogsOptionPass;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -28,7 +29,15 @@ final class Configuration implements ConfigurationInterface {
 					->scalarPrototype()
 						->cannotBeEmpty()
 					->end()
-					->defaultValue([ "app", "php" ])
+					->defaultValue([ "app", "event", "doctrine", "console", "php" ])
+					->cannotBeEmpty()
+				->end()
+				->arrayNode('channels_to_ignore_in_console')
+					->info("These channels will be muted in a Symfony command without the --'".DockerLogsOptionPass::DOCKER_LOGS."'' option.")
+					->scalarPrototype()
+						->cannotBeEmpty()
+					->end()
+					->defaultValue([ "event", "doctrine", "console" ])
 					->cannotBeEmpty()
 				->end()
 				->scalarNode('env_prefix')
@@ -41,7 +50,7 @@ final class Configuration implements ConfigurationInterface {
 					->cannotBeEmpty()
 				->end()
 				->booleanNode('create_other_handler')
-					->info("If true, all channels not listed will have the LOGGING_OTHER level which defaults to 'debug'.")
+					->info("If true, all channels not listed in 'channels' will have the LOGGING_OTHER level which defaults to 'debug'.")
 					->defaultValue(true)
 				->end()
 				->booleanNode('colors')

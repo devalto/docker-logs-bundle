@@ -30,7 +30,8 @@ final class ChrifDockerLogsExtension extends Extension {
 			$config['env_prefix'],
 			$config['debug_channel'],
 			$config['create_other_handler'],
-			$config['colors']
+			$config['colors'],
+			$config['channels_to_ignore_in_console']
 		);
 
 		$handlers = $monologConfigurator->handlersConfig($container);

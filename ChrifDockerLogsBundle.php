@@ -2,6 +2,7 @@
 
 namespace Chrif\Bundle\DockerLogsBundle;
 
+use Chrif\Bundle\DockerLogsBundle\DependencyInjection\Compiler\DockerLogsOptionPass;
 use Symfony\Bundle\MonologBundle\MonologBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -22,5 +23,6 @@ final class ChrifDockerLogsBundle extends Bundle {
 			);
 		}
 
+		$container->addCompilerPass(new DockerLogsOptionPass());
 	}
 }

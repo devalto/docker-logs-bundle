@@ -74,6 +74,10 @@ final class MonologConfigurator {
 	 * @var bool
 	 */
 	private $colors;
+	/**
+	 * @var array
+	 */
+	private $channelsToIgnoreInConsole;
 
 	public function __construct(
 		array $channels,
@@ -81,7 +85,8 @@ final class MonologConfigurator {
 		string $envPrefix,
 		string $debugChannel,
 		bool $createOtherHandler,
-		bool $colors
+		bool $colors,
+		array $channelsToIgnoreInConsole
 	) {
 		$this->channels = $channels;
 		$this->servicePrefix = $servicePrefix;
@@ -89,6 +94,7 @@ final class MonologConfigurator {
 		$this->debugChannel = $debugChannel;
 		$this->createOtherHandler = $createOtherHandler;
 		$this->colors = $colors;
+		$this->channelsToIgnoreInConsole = $channelsToIgnoreInConsole;
 	}
 
 	public function handlersConfig(ContainerBuilder $container) {
@@ -102,7 +108,8 @@ final class MonologConfigurator {
 				$this->envPrefix . strtoupper($channel),
 				$channel == $this->debugChannel ? 'debug' : 'notice',
 				[$channel],
-				false
+				false,
+				in_array($channel, $this->channelsToIgnoreInConsole)
 			);
 		}
 		if ($this->createOtherHandler) {
@@ -113,9 +120,11 @@ final class MonologConfigurator {
 				$this->envPrefix . 'OTHER',
 				'debug',
 				$this->channels,
-				true
+				true,
+				false
 			);
 		}
+
 		return $handlers;
 	}
 
@@ -125,14 +134,15 @@ final class MonologConfigurator {
 		string $levelEnvName,
 		string $defaultLevel,
 		array $channels,
-		bool $exclusive
+		bool $exclusive,
+		bool $ignoredInConsole
 	): array {
 		$container->setParameter("env($levelEnvName)", $defaultLevel);
 		$definition = $container->setDefinition(
 			$serviceId,
 			new Definition(
 				DockerLogsHandler::class,
-				['%env(string:' . $levelEnvName . ')%', $this->colors ]
+				['%env(string:' . $levelEnvName . ')%', $this->colors, $ignoredInConsole]
 			)
 		);
 		$definition->addTag('kernel.event_subscriber');
