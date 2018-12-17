@@ -28,7 +28,7 @@ final class ChrifDockerLogsExtension extends Extension {
 			$config['channels'],
 			'chrif_docker_logs.handler.',
 			$config['env_prefix'],
-			$config['debug_channel'],
+			$config['default_logging_level'],
 			$config['create_other_handler'],
 			$config['colors'],
 			$config['channels_to_ignore_in_console']

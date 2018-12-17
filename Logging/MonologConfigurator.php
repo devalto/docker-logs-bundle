@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\Definition;
  *   channels: ["app","request"]
  *
  *
- * Result after container build:
+ * Changes to container after build will look like this:
  *
  * parameters:
  *   env(LOGGING_APP): "debug"
@@ -38,13 +38,13 @@ use Symfony\Component\DependencyInjection\Definition;
  * services:
  *   chrif_docker_logs.logging.handler.app:
  *     class: Chrif\Bundle\DockerLogsBundle\Logging\DockerLogsHandler
- *     arguments: [ '%env(string:LOGGING_APP)%', true ]
+ *     arguments: [ '%env(string:LOGGING_APP)%', true, false ]
  *   chrif_docker_logs.logging.handler.request:
  *     class: Chrif\Bundle\DockerLogsBundle\Logging\DockerLogsHandler
- *     arguments: [ '%env(string:LOGGING_REQUEST)%', true ]
+ *     arguments: [ '%env(string:LOGGING_REQUEST)%', true, false ]
  *   chrif_docker_logs.logging.handler.other:
  *     class: Chrif\Bundle\DockerLogsBundle\Logging\DockerLogsHandler
- *     arguments: [ '%env(string:LOGGING_OTHER)%', true ]
+ *     arguments: [ '%env(string:LOGGING_OTHER)%', true, false ]
  *
  */
 final class MonologConfigurator {
@@ -64,7 +64,7 @@ final class MonologConfigurator {
 	/**
 	 * @var string
 	 */
-	private $debugChannel;
+	private $defaultLoggingLevel;
 
 	/**
 	 * @var bool
@@ -83,7 +83,7 @@ final class MonologConfigurator {
 		array $channels,
 		string $servicePrefix,
 		string $envPrefix,
-		string $debugChannel,
+		string $defaultLoggingLevel,
 		bool $createOtherHandler,
 		bool $colors,
 		array $channelsToIgnoreInConsole
@@ -91,7 +91,7 @@ final class MonologConfigurator {
 		$this->channels = $channels;
 		$this->servicePrefix = $servicePrefix;
 		$this->envPrefix = $envPrefix;
-		$this->debugChannel = $debugChannel;
+		$this->defaultLoggingLevel = $defaultLoggingLevel;
 		$this->createOtherHandler = $createOtherHandler;
 		$this->colors = $colors;
 		$this->channelsToIgnoreInConsole = $channelsToIgnoreInConsole;
@@ -106,7 +106,7 @@ final class MonologConfigurator {
 				$container,
 				$serviceId,
 				$this->envPrefix . strtoupper($channel),
-				$channel == $this->debugChannel ? 'debug' : 'notice',
+				$this->defaultLoggingLevel,
 				[$channel],
 				false,
 				in_array($channel, $this->channelsToIgnoreInConsole)
