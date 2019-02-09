@@ -8,7 +8,6 @@ use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
@@ -96,6 +95,7 @@ final class DockerLogsHandler extends AbstractProcessingHandler implements Event
 
 	/**
 	 * Sets the console output to use for printing logs.
+	 * @param OutputInterface $output
 	 */
 	public function setOutput(OutputInterface $output) {
 		$this->output = $output;
@@ -114,7 +114,7 @@ final class DockerLogsHandler extends AbstractProcessingHandler implements Event
 	 * @param ConsoleCommandEvent $event
 	 */
 	public function onCommand(ConsoleCommandEvent $event) {
-		$this->isConsole = true;
+		$this->isConsole = php_sapi_name() == 'cli';
 		$input = $event->getInput();
 		$dockerLogs = DockerLogsOptionPass::DOCKER_LOGS;
 		if (!$input->hasOption($dockerLogs) || !$input->getOption($dockerLogs)) {
@@ -131,17 +131,10 @@ final class DockerLogsHandler extends AbstractProcessingHandler implements Event
 		/** @noinspection PhpUnusedParameterInspection */
 		ConsoleTerminateEvent $event
 	) {
-		$this->close();
-	}
-
-	/**
-	 * @param ConsoleErrorEvent $event
-	 */
-	public function onConsoleError(
-		/** @noinspection PhpUnusedParameterInspection */
-		ConsoleErrorEvent $event
-	) {
-		$this->isConsole = true;
+		if ($this->isConsole) {
+			$this->close();
+		}
+		$this->isConsole = false;
 	}
 
 	/**
@@ -197,7 +190,6 @@ final class DockerLogsHandler extends AbstractProcessingHandler implements Event
 		return [
 			ConsoleEvents::COMMAND => ['onCommand', 255],
 			ConsoleEvents::TERMINATE => ['onTerminate', -255],
-			ConsoleEvents::ERROR => ['onConsoleError', 255],
 		];
 	}
 }
